@@ -1,0 +1,24 @@
+.sl a {
+	text-decoration: none;
+}
+.sl {
+	text-align: right;
+}
+#agenda tr {
+	vertical-align: top;
+}
+#agenda {
+	table-layout: auto;
+}
+body {
+	font-size: 62.5%;
+}
+.veld_error {
+	background-color: #FF0000;
+}
+.veld_progress {
+	background-color: #FFFF00;
+}
+.veld_complete {
+	background-color: #00FF00;
+}
