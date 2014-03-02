@@ -11,15 +11,15 @@ $doelgroep = $_GET['doelgroep'];
 switch ($doelgroep) {
 	case 'zelf':
 		$result = mysql_query_safe(<<<EOQ
-SELECT notities.notitie_id, CONCAT(week, CASE dag
+SELECT notities.notitie_id, CONCAT(agenda.week, CASE agenda.dag
 		WHEN 1 THEN 'ma'
 		WHEN 2 THEN 'di'
 		WHEN 3 THEN 'wo'
 		WHEN 4 THEN 'do'
-		ELSE 'vr' END, lesuur) uur,
+		ELSE 'vr' END, agenda.lesuur) uur,
 	CONCAT(orig.text, ' ', IFNULL(GROUP_CONCAT(DISTINCT
 		CONCAT('[', tag, ']') SEPARATOR ''), '')
-	) text, notities.creat `datum/tijd`, GROUP_CONCAT(KB_NAAM(ppl.naam0, ppl.naam1, ppl.naam2)) naam
+	) text, notities.creat `datum/tijd`, GROUP_CONCAT(KB_NAAM(ppl.naam0, ppl.naam1, ppl.naam2)) naam, naam klas
 #, CONCAT('<a href="issue.php?notitie_id=', notities.notitie_id, '">details</a>') details
 FROM ppl2agenda
 JOIN ppl2agenda AS anderen USING (agenda_id)
@@ -29,11 +29,15 @@ JOIN notities USING (notitie_id)
 LEFT JOIN tags2notities AS moretags USING (notitie_id)
 LEFT JOIN tags ON tags.tag_id = moretags.tag_id
 JOIN notities AS orig ON orig.notitie_id = notities.parent_id
+LEFT JOIN agenda AS agenda2 ON agenda2.notitie_id = notities.parent_id
+LEFT JOIN grp2vak2agenda ON grp2vak2agenda.agenda_id = agenda2.agenda_id
+LEFT JOIN grp2vak USING (grp2vak_id)
+LEFT JOIN grp USING (grp_id)
 WHERE ppl2agenda.ppl_id = {$_SESSION['ppl_id']}
 AND anderen.ppl_id != {$_SESSION['ppl_id']}
 AND notities.text IS NULL
 GROUP BY notities.notitie_id
-ORDER BY IF(week < {$lesweken[0]}, 1, 0), week, dag, lesuur
+ORDER BY IF(agenda.week < {$lesweken[0]}, 1, 0), agenda.week, agenda.dag, agenda.lesuur
 EOQ
 		);
 		$table = sprint_table($result);
