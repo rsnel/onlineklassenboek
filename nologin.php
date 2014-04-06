@@ -32,8 +32,14 @@ if (!$ppl_id) {
 		} else {
 			regular_error($http_path.'/', NULL, 'Zoekterm '.htmlentities($_GET['q']).' niet gevonden. Klopt niet niet? Meld het aan de beheerder!');
 		}
-	}
+	} else {
+     // log in database
+	mysql_query_safe("INSERT INTO nologin ( type, id, week, phpsessid ) VALUES ( 'grp', $grp_id, $week, '%s' )", session_id());
+}
 	$target = 'lesgroep';
+} else {
+     // log in database
+	mysql_query_safe("INSERT INTO nologin ( type, id, week, phpsessid ) VALUES ( 'ppl', $ppl_id, $week, '%s' )", session_id());
 }
 
 if ($target == 'leerling') {

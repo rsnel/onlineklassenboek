@@ -82,7 +82,7 @@ de pagina op 'Aanmaken'.-->
 <fieldset style="margin: 0 auto;">
 <legend>Toegang voor leerlingen en ouders</legend>
 Leerlingen en ouders kunnen het klassenboek eenvoudig inkijken door de klas of het leerlingnummer
-in te voeren. Persoonlijke notities, die docenten voor jou hebben gemaakt, kun je natuurlijk alleen zien als je wel inlogt. 
+in te voeren. Persoonlijke notities, die docenten voor jou hebben gemaakt, kun je natuurlijk alleen zien als je inlogt. 
 <p>
 Klas/leerlingnummer <input type="text" name="q"><br>
 <input type="submit" value="Zoeken">
@@ -93,8 +93,8 @@ Klas/leerlingnummer <input type="text" name="q"><br>
 <fieldset style="margin: 0 auto;">
 <legend>Actueel</legend>
 <ul>
+<li>[2014-03-01] Het klassenboek draait nu op de server van school. Problemen? Het aanspreekpunt blijft snelr@ovc.nl</li>
 <li>[2013-09-30] Vanaf vandaag is het klassenboek officieel in gebruik. Vragen/opmerkingen en commentaar kan gestuurd worden naar de beheerder: snelr@ovc.nl</li>
-<li>[2013-09-26] Wegens <a href="http://leasewebnoc.com/en/networkstatus/nl-cloud-problems">grote</a> <a href="http://leasewebnoc.com/en/networkstatus/issues-on-cloud-platform-nl">problemen</a> bij het VPS platform van Leaseweb is het klassenboek tijdelijk offline geweest. De problemen zijn inmiddels <a href="http://blog.leaseweb.com/2013/09/27/public-cloud-outage/">opgelost</a>.</li>
 </ul>
 </fieldset>
 <!--<div id="result">Javascript experiment</div>-->

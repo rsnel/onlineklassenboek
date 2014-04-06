@@ -7,8 +7,8 @@ $vorig_schooljaar_long='2012/2013'; // format YYYY/YYYY
 $lesweken = explode(' ', '35 36 37 38 39 40 41 42 44 45 46 47 48 49 50 51 '.
 	'2 3 4 5 6 7 8 10 11 12 13 14 15 16 19 20 21 22 23 24 25 26 27');
 
-$http_server='onlineklassenboek.nl';
-$http_path='/ovc'; // without trailing slash
+$http_server='klassenboek.ovc.nl';
+$http_path=''; // without trailing slash
 $cookie_path =$http_path.'/';
 $session_subdir = 'ovckb_sessions';
 
