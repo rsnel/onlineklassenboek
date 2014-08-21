@@ -72,9 +72,9 @@ if ($stupid != '') {
 
 function gen_html_footer() { ?>
 <p id="footer">
-Online Klassenboek &copy; 2009-2013 Rik Snel &lt;rik@snel.it&gt;.<br>
+Online Klassenboek &copy; 2009-2014 Rik Snel &lt;rik@snel.it&gt;.<br>
 Released as <a href="http://www.gnu.org/philosophy/free-sw.html">free software</a> without warranties under <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html">GNU AGPL v3</a>.<br>
-Sourcecode: subversion co <a href="http://penta.snel.it/svn/misc/branch/kb-0.1/">http://penta.snel.it/svn/misc/branch/kb-0.1/</a>
+Sourcecode: git clone <a href="https://github.com/rsnel/onlineklassenboek/">https://github.com/rsnel/onlineklassenboek/</a>
 </p>
 </body>
 </html>
