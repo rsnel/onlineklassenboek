@@ -435,120 +435,132 @@ function print_diff($row) {
 	return implode('/', $bla);
 }
 
-$wijz_id = sprint_singular("SELECT MAX(rooster_id) FROM roostertest.weken2roosters JOIN roostertest.weken USING (week_id) WHERE week = $week");
-if ($wijz_id) {
-	$basis_id = sprint_singular("SELECT MAX(rooster_id) FROM roostertest.weken2roosters JOIN roostertest.weken USING (week_id) WHERE wijz_id = 0 AND week = $week");
-} else {
-	$wijz_id = $basis_id = sprint_singular("SELECT MAX(rooster_id) FROM roostertest.weken2roosters WHERE week_id < ( SELECT week_id FROM roostertest.weken WHERE week = $week ) AND wijz_id = 0");
-}
 
-if (!$_SESSION['toon_rooster'] || !$basis_id) {
+if (!$_SESSION['toon_rooster']) {
 	$roosterstatus = 'GEEN';
 	goto out; // geen rooster
 }
 
-$result4 = mysql_query_safe("SELECT basis_id, wijz_id, timestamp FROM roostertest.weken2roosters JOIN roostertest.weken USING (week_id) WHERE rooster_id = $wijz_id");
-$test = mysql_fetch_row($result4);
-$roosterstatus = print_rev($test[2], $test[0].','.$test[1]);
+/*
+if ($_SESSION['orig_ppl_id'] != 3490) {
+	$roosterstatus = 'GEEN';
+	goto out;
+}*/
 
-if ($basis_id == $wijz_id) $wijz_id = 0;
+$week_info = mysql_fetch_row(mysql_query_safe("SELECT week_id, ma, di, wo, do, vr FROM $roosterdb.weken WHERE week = $week"));
+if (!$week_info) {
+	$roosterstatus = 'GEEN';
+	goto out;
+}
+$week_id = $week_info[0];
 
-function rquery_inner($where, $id1, $id2, $wijz) {
-	return <<<EOQ
-SELECT f.zermelo_id AS f_zermelo_id, f.dag AS f_dag, f.uur AS f_uur, f.vakken AS f_vakken,
-	f.docenten AS f_docenten, f.lokalen AS f_lokalen, f.lesgroepen AS f_lesgroepen, f2g.grp_naam AS f_grp_naam, f2g.grp2vak_id AS f_grp2vak_id, f2g.grp_id AS f_grp_id,
-	s.zermelo_id AS s_zermelo_id, s.dag AS s_dag, s.uur AS s_uur, s.vakken AS s_vakken,
-	s.docenten AS s_docenten, s.lokalen AS s_lokalen, s.lesgroepen AS s_lesgroepen, s2g.grp_naam AS s_grp_naam, s2g.grp2vak_id AS s_grp2vak_id, s2g.grp_id AS s_grp_id, e2s.entity_id AS vis, $wijz AS wijz
-FROM roostertest.entities2lessen AS e2f
-JOIN roostertest.rooster2lessen AS r2f ON r2f.les_id = e2f.les_id AND r2f.rooster_id = $id1
-JOIN roostertest.lessen AS f ON f.les_id = e2f.les_id
-LEFT JOIN roostertest.lessen2grp2vak AS f2g ON f2g.les_id = r2f.les_id
-LEFT JOIN (
-	SELECT s.zermelo_id, s.dag, s.uur, s.vakken, s.docenten, s.lokalen, s.lesgroepen, s.les_id
-	FROM roostertest.lessen AS s
-	JOIN roostertest.rooster2lessen AS r2s ON r2s.les_id = s.les_id AND r2s.rooster_id = $id2
-) AS s ON s.zermelo_id = f.zermelo_id
-LEFT JOIN roostertest.entities2lessen AS e2s ON e2s.les_id = s.les_id AND e2s.entity_id = e2f.entity_id
-LEFT JOIN roostertest.lessen2grp2vak AS s2g ON s2g.les_id = s.les_id
-WHERE $where
+$basis = mysql_fetch_assoc(mysql_query_safe(
+	"SELECT file_id, basis_id, timestamp FROM $roosterdb.roosters WHERE week_id <= $week_id AND wijz_id = 0 ORDER BY rooster_id DESC LIMIT 1"));
+if (!$basis) {
+	$roosterstatus = 'GEEN';
+	goto out;
+}
+$wijz = mysql_fetch_assoc(mysql_query_safe(
+	"SELECT file_id, wijz_id, timestamp FROM $roosterdb.roosters WHERE week_id = $week_id AND basis_id = {$basis['basis_id']} ORDER BY rooster_id DESC LIMIT 1"));
+if ($basis['file_id'] == $wijz['file_id'] || !$wijz['file_id']) $wijz['file_id'] = 0;
+
+
+//print_r($basis);
+//print_r($wijz);
+
+function rquery_inner($entity_ids, $id1, $id2, $left, $wijz) {
+	global $roosterdb;
+        //echo("entity_ids = $entity_ids, id1 = $id1, id2 = $id2, left = $left, wijz = $wijz");
+        return <<<EOQ
+SELECT DISTINCT f2l.les_id f_id, l2f.les_id s_id, f2l.zermelo_id f_zid, l2f.zermelo_id s_zid, CASE WHEN l2e.entity_id > 0 THEN 1 ELSE 0 END AS vis, $wijz wijz
+FROM $roosterdb.files2lessen AS f2l
+JOIN $roosterdb.entities2lessen AS e2l ON e2l.les_id = f2l.les_id
+{$left}JOIN $roosterdb.files2lessen AS l2f ON f2l.zermelo_id = l2f.zermelo_id AND l2f.file_id = $id2
+LEFT JOIN $roosterdb.entities2lessen AS l2e ON l2f.les_id = l2e.les_id AND l2e.entity_id IN ($entity_ids)
+WHERE f2l.file_id = $id1 AND e2l.entity_id IN ($entity_ids)
 EOQ;
 }
 
-function rquery($where, $id1, $id2) {
-	return rquery_inner($where, $id1, $id2, 1).' UNION ALL '.rquery_inner($where, $id2, $id1, 0);
+function rquery($entity_ids, $id1, $id2, $left) {
+        return rquery_inner($entity_ids, $id1, $id2, $left, 0).
+                "\nUNION ALL\n".rquery_inner($entity_ids, $id2, $id1, 'LEFT ', 1);
 }
 
-function rquery_new($entity_ids, $id1, $id2) {
-	 return mysql_query_safe('SELECT * FROM ( '.rquery("e2f.entity_id IN ( $entity_ids ) ", $id1, $id2).' ) AS r ORDER BY f_uur, f_dag, wijz DESC, s_zermelo_id');
-}
-
+$rostertype = 0;
 if ($_SESSION['type'] == 'personeel') {
 	if ($doelgroep == 'zelf') {
 		$rostertype = 2;
 		$entity_ids = <<<EOQ
-SELECT entities.entity_id
-FROM roostertest.ovckb2entities
-JOIN roostertest.entities ON entities.entity_id = ovckb2entities.entity_id AND entity_type = 2
-WHERE ovckb_id = {$_SESSION['ppl_id']}
+SELECT entity_id FROM ppl
+JOIN $roosterdb.entities ON entities.entity_name = login
+WHERE ppl_id = {$_SESSION['ppl_id']}
 EOQ;
 	} else if ($doelgroep == 'leerling') {
 		$rostertype = 1;
 		$entity_ids = <<<EOQ
 SELECT entities.entity_id
-FROM roostertest.ovckb2entities
-JOIN roostertest.entities ON entities.entity_id = ovckb2entities.entity_id AND entity_type = 4
-JOIN grp ON grp.grp_id = ovckb_id
-JOIN ppl2grp USING (grp_id)
-WHERE ppl_id = '$lln_id'
+FROM $roosterdb.entities
+JOIN $roosterdb.grp2ppl ON grp2ppl.file_id_basis = {$basis['file_id']} AND lesgroep_id = entity_id
+JOIN $roosterdb.entities AS lln ON lln.entity_id = grp2ppl.ppl_id
+JOIN ppl ON ppl.login = lln.entity_name
+WHERE ppl.ppl_id = '$lln_id'
 EOQ;
 	} else if ($doelgroep == 'lesgroep') {
 		$rostertype = 4;
 		$entity_ids = <<<EOQ
-SELECT DISTINCT entities.entity_id
-FROM grp2vak
-JOIN ppl2grp USING (grp_id)
-JOIN ppl2grp AS grp2ppl USING (ppl_id)
-JOIN roostertest.ovckb2entities ON grp2ppl.grp_id = ovckb2entities.ovckb_id
-JOIN roostertest.entities ON entities.entity_id = ovckb2entities.entity_id AND entity_type = 4
+SELECT entities.entity_id
+FROM $roosterdb.entities
+JOIN $roosterdb.grp2grp ON grp2grp.file_id_basis = {$basis['file_id']} AND grp2grp.lesgroep_id = entity_id
+JOIN $roosterdb.entities AS lgrp ON lgrp.entity_id = grp2grp.lesgroep2_id
+JOIN grp ON grp.naam = lgrp.entity_name
+JOIN grp2vak ON grp2vak.grp_id = grp.grp_id
 WHERE grp2vak_id = '$grp2vak_id'
 EOQ;
 
 	}
-	$result4 = rquery_new($entity_ids, $basis_id, $wijz_id);
 } else if ($_SESSION['type'] == 'leerling') {
 	$rostertype = 1;
 	$entity_ids = <<<EOQ
 SELECT entities.entity_id
-FROM roostertest.ovckb2entities
-JOIN roostertest.entities ON entities.entity_id = ovckb2entities.entity_id AND entity_type = 4
-JOIN grp ON grp.grp_id = ovckb_id
-JOIN ppl2grp USING (grp_id)
-WHERE ppl_id = {$_SESSION['ppl_id']}
+FROM $roosterdb.entities
+JOIN $roosterdb.grp2ppl ON grp2ppl.file_id_basis = {$basis['file_id']} AND lesgroep_id = entity_id
+JOIN $roosterdb.entities AS lln ON lln.entity_id = grp2ppl.ppl_id
+JOIN ppl ON ppl.login = lln.entity_name
+WHERE ppl.ppl_id = {$_SESSION['ppl_id']}
 EOQ;
-	$result4 = rquery_new($entity_ids, $basis_id, $wijz_id);
-} else if ($_SESSION['type'] == 'ouder') {
-	$type = sprint_singular("SELECT type FROM ppl WHERE ppl_id = '$lln_id'");
-	if ($type == 'leerling') {
-		$rostertype = 1;
-		$entity_ids = <<<EOQ
-SELECT entities.entity_id
-FROM roostertest.ovckb2entities
-JOIN roostertest.entities ON entities.entity_id = ovckb2entities.entity_id AND entity_type = 4
-JOIN grp ON grp.grp_id = ovckb_id
-JOIN ppl2grp USING (grp_id)
-WHERE ppl_id = '$lln_id'
-EOQ;
-		$result4 = rquery_new($entity_ids, $basis_id, $wijz_id);
-	} else if ($type == 'personeel') {
-		$rostertype = 2;
-		$entity_ids = <<<EOQ
-SELECT entities.entity_id
-FROM roostertest.ovckb2entities
-JOIN roostertest.entities ON entities.entity_id = ovckb2entities.entity_id AND entity_type = 2
-WHERE ovckb_id = '$lln_id'
-EOQ;
-		$result4 = rquery_new($entity_ids, $basis_id, $wijz_id);
-	} 
+}
+
+//echo($entity_ids);
+
+if (!$rostertype) {
+	$roosterstatus = 'GEEN';
+	goto out;
+}
+
+$subquery = rquery($entity_ids, $basis['file_id'], $wijz['file_id'], 'LEFT ');
+
+$result4 = mysql_query_safe(<<<EOQ
+SELECT f_zid, f.lesgroepen AS f_lesgroepen, f.vakken AS f_vakken,
+        f.docenten AS f_docenten, f.lokalen AS f_lokalen,
+        f.dag AS f_dag, f.uur AS f_uur, f.notitie AS f_notitie, wijz,
+        s_zid, s.lesgroepen AS s_lesgroepen, s.vakken AS s_vakken,
+        s.docenten AS s_docenten, s.lokalen AS s_lokalen,
+        s.dag AS s_dag, s.uur AS s_uur, s.notitie AS s_notitie, vis
+FROM ( $subquery ) AS sub
+JOIN $roosterdb.lessen AS f ON f.les_id = f_id
+LEFT JOIN $roosterdb.lessen AS s ON s.les_id = s_id
+WHERE f.lesgroepen IS NOT NULL AND f.dag != 0 AND f.uur != 0
+ORDER BY f_uur, f_dag, wijz DESC, s_zid
+EOQ
+);
+
+$roosterstatus = 'basisrooster '.print_rev($basis['timestamp'], $basis['basis_id']);
+if ($wijz['file_id']) 
+	$roosterstatus .= ', wijzigingen '.print_rev($wijz['timestamp'], $wijz['wijz_id']).'.';
+else $roosterstatus .= ', nog geen roosterwijzigingen bekend.';
+
+if ($_SESSION['orig_ppl_id'] == 3490) {
+//	echo(sprint_table($result4));
 }
 
 out:
@@ -633,11 +645,12 @@ for ($i = 1; $i <= 9; $i++) { ?>
 		while (is_array($rosterrow) && $rosterrow['f_dag'] == $j && $rosterrow['f_uur'] == $i) {
 			$extra = '';
 			$text = '';
-			if ($rosterrow['s_zermelo_id'] && !$rosterrow['s_dag'] && $rosterrow['wijz']) $extra = ' uitval';
-			else if (!$rosterrow['s_zermelo_id'] && !$rosterrow['wijz']) $extra = ' extra';
+			if (!$week_info[$j]) $extra = ' vrijstelling';
+			else if ($rosterrow['s_zid'] && !$rosterrow['s_dag'] && $wijz['file_id']) $extra = ' uitval';
+			else if (!$rosterrow['f_zid'] && !$rosterrow['wijz']) $extra = ' extra';
 			else if ($rosterrow['f_dag'] == $rosterrow['s_dag'] && $rosterrow['f_uur'] == $rosterrow['s_uur'] && $rosterrow['vis']) {
 				// les is niet in tijd verplaatst, maar wel gewijzigd, beide zijn zichtbaar
-				if ($rosterrow['wijz']) { // dit is de oude les, skip
+				if (!$rosterrow['wijz']) { // dit is de oude les, skip
 					$rosterrow = mysql_fetch_array($result4);
 					continue;
 				} else if ( $rosterrow['f_vakken'] != $rosterrow['s_vakken'] ||
@@ -647,24 +660,32 @@ for ($i = 1; $i <= 9; $i++) { ?>
 						$extra = ' gewijzigd';
 						$text = ' <- '.print_diff($rosterrow);
 				}
-			} else if ($rosterrow['wijz'] && $rosterrow['s_zermelo_id']) {
+			} else if (!$rosterrow['wijz'] && $rosterrow['s_zid']) {
 				$text = ' -> '.print_diff($rosterrow);
 				$extra = ' verplaatstnaar';
-			} else if (!$rosterrow['wijz'] && $rosterrow['s_zermelo_id']) {
+			} else if ($rosterrow['wijz'] && $rosterrow['s_zid']) {
 				$text = ' <- '.print_diff($rosterrow);
 				$extra = ' verplaatstvan';
 			}
 			$info = array();
 			if ($rostertype != 1) {
 				$grp_naam = NULL;
-				if ($rosterrow['f_grp_naam']) {
+				
+				/*if ($rosterrow['f_lesgroepen']) {
 					if ($grp_id != $rosterrow['f_grp_id']) 
-						$grp_naam = $rosterrow['f_grp_naam'];
-						//$info[] = $rosterrow['f_grp_naam'].'('.$rosterrow['f_grp_id'].')';
-				} else if ($rosterrow['f_lesgroepen']) $grp_naam = $rosterrow['f_lesgroepen'];
-				if ($grp_naam) $info[] = $grp_naam;
+						$grp_naam = $rosterrow['f_lesgroepen'];
+						//$info[] = $rosterrow['f_lesgroepen'].'('.$rosterrow['f_grp_id'].')';
+				} else if ($rosterrow['f_lesgroepen']) $grp_naam = $rosterrow['f_lesgroepen'];*/
+				/*if ($grp_naam) $info[] = $grp_naam; */
 				// check of het vak al in de naam van de lesgroep zit
-				if (!$grp_naam || !preg_match("/{$rosterrow['f_vakken']}[0-9]?/i", $grp_naam)) $info[] = $rosterrow['f_vakken'];
+				$info[] = $rosterrow['f_lesgroepen'];
+				if (count(explode(',', $rosterrow['f_lesgroepen'])) == 1) {
+					$grp_naam = $rosterrow['f_lesgroepen'];
+				}
+
+				if (!$grp_naam) $info[] = $rosterrow['f_vakken'];
+				else if	(!preg_match("/{$rosterrow['f_vakken']}[0-9]?/i", $grp_naam)) $info[] = $rosterrow['f_vakken'];
+
 			} else if ($rosterrow['f_vakken']) $info[] = $rosterrow['f_vakken'];
 			if ($rostertype != 2) if ($rosterrow['f_docenten']) $info[] = $rosterrow['f_docenten'];
 			if ($rosterrow['f_lokalen']) $info[] = $rosterrow['f_lokalen'];
