@@ -93,6 +93,7 @@ Klas/leerlingnummer <input type="text" name="q"><br>
 <fieldset style="margin: 0 auto;">
 <legend>Actueel</legend>
 <ul>
+<li>[2014-08-18] De gegevens voor het schooljaar 2014/2015 zijn ingelezen. Staat er iets niet goed of heb je een andere vraag of opmerking? Neem dan contact op met de beheerder meneer Snel: snelr@ovc.nl.
 <li>[2014-03-01] Het klassenboek draait nu op de server van school. Problemen? Het aanspreekpunt blijft snelr@ovc.nl</li>
 <li>[2013-09-30] Vanaf vandaag is het klassenboek officieel in gebruik. Vragen/opmerkingen en commentaar kan gestuurd worden naar de beheerder: snelr@ovc.nl</li>
 </ul>
