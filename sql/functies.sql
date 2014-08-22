@@ -1,64 +1,88 @@
--- phpMyAdmin SQL Dump
--- version 3.4.11.1deb2+deb7u1
--- http://www.phpmyadmin.net
+-- MySQL dump 10.13  Distrib 5.5.38, for debian-linux-gnu (x86_64)
 --
--- Host: localhost
--- Generation Time: Aug 22, 2014 at 07:51 AM
--- Server version: 5.5.38
--- PHP Version: 5.4.4-14+deb7u12
-
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+-- Host: localhost    Database: klassenboek
+-- ------------------------------------------------------
+-- Server version	5.5.38-0+wheezy1-log
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Database: `mysql`
+-- Dumping routines for database 'klassenboek'
 --
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `KB_LGRP`(
+grp VARCHAR( 16 ) ,
+vak VARCHAR( 8 )
+) RETURNS varchar(25) CHARSET utf8
+    DETERMINISTIC
+BEGIN RETURN IF( grp REGEXP vak, grp, CONCAT( grp, '/', vak ) ) ; END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `KB_LINK`(
+target VARCHAR( 32 ) ,
+notitie_id INT( 11 ),
+dag INT ( 1 ),
+lesuur INT ( 1 ),
+additional VARCHAR( 256 ),
+text VARCHAR( 32 )
+) RETURNS varchar(512) CHARSET utf8
+    DETERMINISTIC
+BEGIN RETURN CONCAT('<a style="text-decoration: none" href="', target, '?notitie_id=', notitie_id, '&dag=', dag, '&lesuur=', lesuur, additional, '">', text, '</a>'); END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `KB_NAAM`(
+naam0 VARCHAR( 128 ) ,
+naam1 VARCHAR( 64 ) ,
+naam2 VARCHAR( 16 )
+) RETURNS varchar(190) CHARSET utf8
+    DETERMINISTIC
+BEGIN RETURN CONCAT( naam1, ' ', TRIM( LEADING ' ' FROM CONCAT( naam2, ' ', naam0 ) ) ); END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
--- --------------------------------------------------------
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
---
--- Table structure for table `proc`
---
-
-CREATE TABLE IF NOT EXISTS `proc` (
-  `db` char(64) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
-  `name` char(64) NOT NULL DEFAULT '',
-  `type` enum('FUNCTION','PROCEDURE') NOT NULL,
-  `specific_name` char(64) NOT NULL DEFAULT '',
-  `language` enum('SQL') NOT NULL DEFAULT 'SQL',
-  `sql_data_access` enum('CONTAINS_SQL','NO_SQL','READS_SQL_DATA','MODIFIES_SQL_DATA') NOT NULL DEFAULT 'CONTAINS_SQL',
-  `is_deterministic` enum('YES','NO') NOT NULL DEFAULT 'NO',
-  `security_type` enum('INVOKER','DEFINER') NOT NULL DEFAULT 'DEFINER',
-  `param_list` blob NOT NULL,
-  `returns` longblob NOT NULL,
-  `body` longblob NOT NULL,
-  `definer` char(77) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `modified` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `sql_mode` set('REAL_AS_FLOAT','PIPES_AS_CONCAT','ANSI_QUOTES','IGNORE_SPACE','NOT_USED','ONLY_FULL_GROUP_BY','NO_UNSIGNED_SUBTRACTION','NO_DIR_IN_CREATE','POSTGRESQL','ORACLE','MSSQL','DB2','MAXDB','NO_KEY_OPTIONS','NO_TABLE_OPTIONS','NO_FIELD_OPTIONS','MYSQL323','MYSQL40','ANSI','NO_AUTO_VALUE_ON_ZERO','NO_BACKSLASH_ESCAPES','STRICT_TRANS_TABLES','STRICT_ALL_TABLES','NO_ZERO_IN_DATE','NO_ZERO_DATE','INVALID_DATES','ERROR_FOR_DIVISION_BY_ZERO','TRADITIONAL','NO_AUTO_CREATE_USER','HIGH_NOT_PRECEDENCE','NO_ENGINE_SUBSTITUTION','PAD_CHAR_TO_FULL_LENGTH') NOT NULL DEFAULT '',
-  `comment` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `character_set_client` char(32) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `collation_connection` char(32) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `db_collation` char(32) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `body_utf8` longblob,
-  PRIMARY KEY (`db`,`name`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Stored Procedures';
-
---
--- Dumping data for table `proc`
---
-
-INSERT INTO `proc` (`db`, `name`, `type`, `specific_name`, `language`, `sql_data_access`, `is_deterministic`, `security_type`, `param_list`, `returns`, `body`, `definer`, `created`, `modified`, `sql_mode`, `comment`, `character_set_client`, `collation_connection`, `db_collation`, `body_utf8`) VALUES
-('klassenboek', 'KB_LGRP', 'FUNCTION', 'KB_LGRP', 'SQL', 'CONTAINS_SQL', 'YES', 'DEFINER', 0x0a6772702056415243484152282031362029202c0a76616b205641524348415228203820290a, 0x766172636861722832352920434841525345542075746638, 0x424547494e2052455455524e2049462820677270205245474558502076616b2c206772702c20434f4e43415428206772702c20272f272c2076616b20292029203b20454e44, 'root@localhost', '2014-03-01 14:11:34', '2014-03-01 14:11:34', 'NO_AUTO_VALUE_ON_ZERO', '', 'utf8', 'utf8_general_ci', 'latin1_swedish_ci', 0x424547494e2052455455524e2049462820677270205245474558502076616b2c206772702c20434f4e43415428206772702c20272f272c2076616b20292029203b20454e44),
-('klassenboek', 'KB_LINK', 'FUNCTION', 'KB_LINK', 'SQL', 'CONTAINS_SQL', 'YES', 'DEFINER', 0x0a7461726765742056415243484152282033322029202c0a6e6f74697469655f696420494e542820313120292c0a64616720494e542028203120292c0a6c657375757220494e542028203120292c0a6164646974696f6e616c2056415243484152282032353620292c0a7465787420564152434841522820333220290a, 0x76617263686172283531322920434841525345542075746638, 0x424547494e2052455455524e20434f4e43415428273c61207374796c653d22746578742d6465636f726174696f6e3a206e6f6e652220687265663d22272c207461726765742c20273f6e6f74697469655f69643d272c206e6f74697469655f69642c2027266461673d272c206461672c2027266c65737575723d272c206c65737575722c206164646974696f6e616c2c2027223e272c20746578742c20273c2f613e27293b20454e44, 'root@localhost', '2014-03-01 14:11:34', '2014-03-01 14:11:34', 'NO_AUTO_VALUE_ON_ZERO', '', 'utf8', 'utf8_general_ci', 'latin1_swedish_ci', 0x424547494e2052455455524e20434f4e43415428273c61207374796c653d22746578742d6465636f726174696f6e3a206e6f6e652220687265663d22272c207461726765742c20273f6e6f74697469655f69643d272c206e6f74697469655f69642c2027266461673d272c206461672c2027266c65737575723d272c206c65737575722c206164646974696f6e616c2c2027223e272c20746578742c20273c2f613e27293b20454e44),
-('klassenboek', 'KB_NAAM', 'FUNCTION', 'KB_NAAM', 'SQL', 'CONTAINS_SQL', 'YES', 'DEFINER', 0x0a6e61616d30205641524348415228203132382029202c0a6e61616d312056415243484152282036342029202c0a6e61616d3220564152434841522820313620290a, 0x76617263686172283139302920434841525345542075746638, 0x424547494e2052455455524e20434f4e43415428206e61616d312c202720272c205452494d28204c454144494e47202720272046524f4d20434f4e43415428206e61616d322c202720272c206e61616d302029202920293b20454e44, 'root@localhost', '2014-03-01 14:11:34', '2014-03-01 14:11:34', 'NO_AUTO_VALUE_ON_ZERO', '', 'utf8', 'utf8_general_ci', 'latin1_swedish_ci', 0x424547494e2052455455524e20434f4e43415428206e61616d312c202720272c205452494d28204c454144494e47202720272046524f4d20434f4e43415428206e61616d322c202720272c206e61616d302029202920293b20454e44);
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+-- Dump completed on 2014-08-22  7:54:12
