@@ -560,8 +560,8 @@ EOQ
 
 $roosterstatus = 'basisrooster '.print_rev($basis['timestamp'], $basis['basis_id']);
 if ($wijz['file_id']) 
-	$roosterstatus .= ', wijzigingen '.print_rev($wijz['timestamp'], $wijz['wijz_id']).'.';
-else $roosterstatus .= ', nog geen roosterwijzigingen bekend.';
+	$roosterstatus .= ', wijzigingen '.print_rev($wijz['timestamp'], $wijz['wijz_id']);
+else $roosterstatus .= ', nog geen roosterwijzigingen bekend';
 
 if ($_SESSION['orig_ppl_id'] == 3490) {
 //	echo(sprint_table($result4));
