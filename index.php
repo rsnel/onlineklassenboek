@@ -76,12 +76,17 @@ if ($_SESSION['type'] == 'ouder') {
 
 mysql_query_safe("SET SESSION group_concat_max_len = 65536");
 
+$year_lasthalf = substr($schooljaar_long, 5);
+$year_firsthalf = substr($schooljaar_long, 0, 4);
+
 $no_issues = sprint_singular(<<<EOQ
 SELECT COUNT(*) FROM ppl2agenda
 	JOIN agenda USING (agenda_id)
 	JOIN notities USING (notitie_id)
 	WHERE ppl_id = {$_SESSION['ppl_id']}
 	AND text IS NULL
+	AND creat >= '{$year_firsthalf}0801'
+	AND creat < '{$year_lasthalf}0801'
 EOQ
 );
 $common = "&doelgroep=$doelgroep&view=week&week=$week&grp2vak_id=$grp2vak_id&lln=$lln_id";
@@ -107,6 +112,8 @@ LEFT JOIN vak USING (vak_id)
 WHERE lln2agenda.ppl_id = '$lln_id'
 AND doc2agenda.ppl_id = {$_SESSION['ppl_id']}
 AND notities.text IS NULL
+AND notities.creat >= '{$year_firsthalf}0801'
+AND notities.creat < '{$year_lasthalf}0801'
 EOQ
 );
 while ($row = mysql_fetch_row($this_issues)) {
@@ -342,9 +349,6 @@ AND grp_id = ANY (
 EOQ;
 		break;
 }
-
-$year_lasthalf = substr($schooljaar_long, 5);
-$year_firsthalf = substr($schooljaar_long, 0, 4);
 
 $testresult = mysql_query_safe(<<<EOT
 SELECT dag, lesuur, GROUP_CONCAT(text ORDER BY grp DESC, notitie_id SEPARATOR '\n') text

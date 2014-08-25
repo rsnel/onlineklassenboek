@@ -8,6 +8,9 @@ $doelgroep = $_GET['doelgroep'];
 //$grp2vak_id = mysql_escape_safe($_GET['grp2vak_id']);
 //$lln_id = mysql_escape_safe($_GET['grp2vak_id']);
 
+$schooljaar_first = substr($schooljaar_long, 0, 4);
+$schooljaar_last = substr($schooljaar_long, 5, 4);
+
 switch ($doelgroep) {
 	case 'zelf':
 		$result = mysql_query_safe(<<<EOQ
@@ -36,6 +39,8 @@ LEFT JOIN grp USING (grp_id)
 WHERE ppl2agenda.ppl_id = {$_SESSION['ppl_id']}
 AND anderen.ppl_id != {$_SESSION['ppl_id']}
 AND notities.text IS NULL
+AND notities.creat >= '{$schooljaar_first}0801'
+AND notities.creat < '{$schooljaar_last}0801'
 GROUP BY notities.notitie_id
 ORDER BY IF(agenda.week < {$lesweken[0]}, 1, 0), agenda.week, agenda.dag, agenda.lesuur
 EOQ
