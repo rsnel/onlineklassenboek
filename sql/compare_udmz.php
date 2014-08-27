@@ -291,13 +291,18 @@ while ($row = mysql_fetch_assoc($result)) {
 	else $doc2grp2vak[$row['ppl_id']][$row['grp2vak_id']] = array('old' => 1, 'new' => 0);
 }
 
-print_r($doc2grp2vak);
+//print_r($doc2grp2vak);
 
-/*
-foreach ($udmz['Docent'] as $id => $row) {
-	checkset($row, 'Docent', array ('Voornaam', 'Tussenvoegsel', 
-		'Achternaam', 'e-mail'));
-	echo($id.' '.$row['Voornaam'].' '.$row['Tussenvoegsel'].' '.$row['Achternaam'].' '.$row['e-mail']."\n");
+foreach ($doc2grp2vak as $ppl_id => $grp2vaks) {
+	foreach ($grp2vaks as $grp2vak_id => $data) {
+		if ($data['old'] == $data['new']) continue;
+		echo("ppl_id=$ppl_id grp2vak_id=$grp2vak_id old={$data['old']} new={$data['new']}\n");
+		if ($data['old'] == 1 && $data['new'] == 0) 
+			mysql_query_safe("DELETE FROM doc2grp2vak WHERE ppl_id = $ppl_id AND grp2vak_id = $grp2vak_id");
+		else if ($data['old'] == 0 && $data['new'] == 1)
+			mysql_query_safe("INSERT INTO doc2grp2vak ( ppl_id, grp2vak_id ) VALUES ( $ppl_id, $grp2vak_id )");
+		else fatal_error("impossible!");
+	}
 }
- */
+
 ?>
