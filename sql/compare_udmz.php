@@ -209,8 +209,90 @@ foreach ($ppl2grp as $ppl_id => $grps) {
 	}
 }
 
-//print_r($ppl);
-//print_r($grp2ppl);
+function cleanup_lesgroepen($lesgroep) {
+        // 1A.1A2A wordt 1A2A als er een stamklas met naam 1A2A bekend is in categorie 1A
+        global $stamz;
+        if (preg_match('/(\w+)\.(\w+)/', $lesgroep, $matches)) {
+                if (isset($stamz[$matches[2]]) && $stamz[$matches[2]] == $matches[1]) return $matches[2];
+        }
+
+        return $lesgroep;
+}
+
+$nodup = array();
+$doc2grp2vak = array();
+
+foreach ($udmz['Les'] as $id => $row) {
+	checkset($row, 'Les', array('Vak', 'Grp', 'Doc'));
+
+	// ignore duplicates
+	$dupid = "{$row['Vak']}/{$row['Doc']}/{$row['Grp']}";
+	if (isset($nodup[$dupid])) continue;
+	$nodup[$dupid] = 1;
+
+	if ($row['Grp'] == '' || $row['Doc'] == '') continue;
+	if ($row['Vak'] == '') fatal_error("geen vak in les $id?!?!");
+
+	$grps = explode(',', $row['Grp']);
+	$docs = explode(',', $row['Doc']);
+	$vaks = explode(',', $row['Vak']);
+
+	$no_grps = count($grps);
+	$no_docs = count($docs);
+	$no_vaks = count($vaks);
+
+	if ($no_vaks == 1) {
+		$vak_id = sprint_singular("SELECT vak_id FROM vak WHERE afkorting = '%s'", mysql_escape_safe($vaks[0]));
+		if (!$vak_id) {
+			mysql_query_safe("INSERT INTO vak ( afkorting ) VALUES ( '%s' )", mysql_escape_safe($vaks[0]));
+			$vak_id = mysql_insert_id();
+		}
+		foreach ($grps as $lesgroep) {
+			$lesgroep = cleanup_lesgroepen($lesgroep);
+			if (!isset($grp[$lesgroep])) fatal_error("groep $lesgroep onbekend!?!!?");
+			$grp_id = $grp[$lesgroep];
+			
+			$grp2vak_id = sprint_singular("SELECT grp2vak_id FROM grp2vak WHERE grp_id = $grp_id AND vak_id = $vak_id");
+			if (!$grp2vak_id) {
+				mysql_query_safe("INSERT INTO grp2vak ( grp_id, vak_id ) VALUES ( $grp_id, $vak_id )");
+				$grp2vak_id = mysql_insert_id();
+			}
+			foreach ($docs as $doc) {
+				if (!isset($ppl[$doc])) fatal_error("docent $doc onbekend?!?!");
+				$doc_id = $ppl[$doc];
+				//echo("$lesgroep/{$vaks[0]} $grp2vak_id {$row['Doc']} $doc_id\n");
+				if (!isset($doc2grp2vak[$doc_id])) $doc2grp2vak[$doc_id] = array();
+				if (isset($doc2grp2vak[$doc_id][$grp2vak_id])) continue;
+				$doc2grp2vak[$doc_id][$grp2vak_id] = array('old' => 0, 'new' => 1);
+			}
+		}
+	} else {
+		echo("handmatig {$row['Vak']}, {$row['Grp']}, {$row['Doc']}\n");
+	}
+
+	//if (count(explode(',', $row['Grp'])) > 1)
+
+	continue;
+	foreach (explode(',', $row['Grp']) as $lesgroep) {
+		$lesgroep = cleanup_lesgroepen($lesgroep);
+		if (count(explode(',', $row['Vak'])) > 1)
+		echo("$id {$row['Vak']}, $lesgroep, {$row['Doc']}\n");
+	}
+}
+
+$result = mysql_query("SELECT ppl_id, grp2vak_id FROM doc2grp2vak JOIN grp2vak USING (grp2vak_id) JOIN grp USING (grp_id) WHERE schooljaar = '$schooljaar'");
+
+while ($row = mysql_fetch_assoc($result)) {
+	if (!isset($doc2grp2vak[$row['ppl_id']]))
+		$doc2grp2vaqk[$row['ppl_id']] = array();
+
+	if (isset($doc2grp2vak[$row['ppl_id']][$row['grp2vak_id']])) 
+		$doc2grp2vak[$row['ppl_id']][$row['grp2vak_id']]['old'] = 1;
+	else $doc2grp2vak[$row['ppl_id']][$row['grp2vak_id']] = array('old' => 1, 'new' => 0);
+}
+
+print_r($doc2grp2vak);
+
 /*
 foreach ($udmz['Docent'] as $id => $row) {
 	checkset($row, 'Docent', array ('Voornaam', 'Tussenvoegsel', 
