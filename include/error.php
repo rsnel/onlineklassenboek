@@ -33,6 +33,11 @@
 }
 
 function fatal_error($str) {
+	global $cli;
+	if ($cli) {
+		echo($str."\n");
+		exit(1);
+	}
 	throw new Exception($str, 2);
 }
 
