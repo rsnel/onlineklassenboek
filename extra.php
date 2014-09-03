@@ -116,11 +116,10 @@ Selecteer een groep en klik op &eacute;&eacute;n van de knoppen erachter.
 <!--<input type="submit" name="submit" value="Genereer aanmaakcodes">-->
 <input type="submit" name="submit" value="Last login">
 <!--<input type="submit" name="submit" value="Emailadressen">
-<input type="submit" name="submit" value="Ouders">
-<input type="submit" name="submit" value="oude vakken/docenten">-->
+<input type="submit" name="submit" value="Ouders">-->
+<input type="submit" name="submit" value="oude vakken/docenten">
 <input type="submit" name="submit" value="Login histogram">
 </form>
-<!--
 <? } ?>
 <? if ($grp_select_vorig_jaar) { ?>
 <h2>Informatie uitgaande van groepen van schooljaar <? 
@@ -133,7 +132,6 @@ Selecteer een groep en klik op &eacute;&eacute;n de knoppen erachter.
 <input type="submit" name="submit" value="nieuwe vakken/docenten">
 </form>
 <? } ?>
--->
 <!--
 <h2>Leerling zoeken</h2>
 
