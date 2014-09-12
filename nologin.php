@@ -154,6 +154,10 @@ function print_diff($row) {
 	return implode('/', $bla);
 }
 
+$roosterstatus = 'Log in om in het <a href="https://klassenboek.ovc.nl/">klassenboek</a> het rooster te zien en zelf notities te maken.';
+goto out; // geen rooster
+
+/*
 $wijz_id = sprint_singular("SELECT MAX(rooster_id) FROM roostertest.weken2roosters JOIN roostertest.weken USING (week_id) WHERE week = $week");
 if ($wijz_id) {
 	$basis_id = sprint_singular("SELECT MAX(rooster_id) FROM roostertest.weken2roosters JOIN roostertest.weken USING (week_id) WHERE wijz_id = 0 AND week = $week");
@@ -163,9 +167,8 @@ if ($wijz_id) {
 
 if (true || !$basis_id) {
 	$roosterstatus = 'GEEN';
-	goto out; // geen rooster
 }
-
+ */
 $result4 = mysql_query_safe("SELECT basis_id, wijz_id, timestamp FROM roostertest.weken2roosters JOIN roostertest.weken USING (week_id) WHERE rooster_id = $wijz_id");
 $test = mysql_fetch_row($result4);
 $roosterstatus = print_rev($test[2], $test[0].','.$test[1]);
