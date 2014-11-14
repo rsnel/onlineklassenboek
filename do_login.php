@@ -13,6 +13,12 @@ function authserver($username, $password) {
 	} else if (!curl_setopt($ch, CURLOPT_USERPWD, 'LEERLING\\'.$username.':'.$password))
                         fatal_error(curl_error($ch));
 
+	// tijdelijke maatregel, certificaat verlopen
+	/*
+	if (!curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false))
+		fatal_error(curl_error($ch));
+	 */
+
 	if (!curl_setopt($ch, CURLOPT_RETURNTRANSFER, true))
 		fatal_error(curl_error($ch));
 
