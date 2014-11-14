@@ -22,8 +22,8 @@ SELECT notities.notitie_id, CONCAT(agenda.week, CASE agenda.dag
 		ELSE 'vr' END, agenda.lesuur) uur,
 	CONCAT(orig.text, ' ', IFNULL(GROUP_CONCAT(DISTINCT
 		CONCAT('[', tag, ']') SEPARATOR ''), '')
-	) text, notities.creat `datum/tijd`, GROUP_CONCAT(KB_NAAM(ppl.naam0, ppl.naam1, ppl.naam2)) naam, naam klas
-#, CONCAT('<a href="issue.php?notitie_id=', notities.notitie_id, '">details</a>') details
+	) text, notities.creat `datum/tijd`, GROUP_CONCAT(KB_NAAM(ppl.naam0, ppl.naam1, ppl.naam2)) naam, naam klas,
+CONCAT('<a href="vvv_zelf.php?notitie_id=', notities.notitie_id, '">sluiten</a>') sluiten
 FROM ppl2agenda
 JOIN ppl2agenda AS anderen USING (agenda_id)
 JOIN ppl ON ppl.ppl_id = anderen.ppl_id
