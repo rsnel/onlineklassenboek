@@ -62,6 +62,7 @@ Om deze website te kunnen gebruiken moet je
 <a href="http://nl.wikipedia.org/wiki/Cookies">cookies</a> en
 <a href="http://nl.wikipedia.org/wiki/Javascript">javascript</a> aan hebben staan.
 Gebruikers van het onlineklassenboek loggen in met hun gebruikersnaam en wachtwoord van school.
+<b>Docenten loggen vanaf nu in met hun nieuwe gebruikersnaam.</b>
 <!-- Medewerkers van school loggen in met hun schoolaccount.-->
 <!--Leerlingen loggen in met hun leerlingnummer en medewerkers van school doen dat met
 hun afkorting. Ouders loggen in met hun zelfgekozen code.-->

@@ -4,14 +4,17 @@ check_isset_array($_POST, 'login', 'password');
 check_required_POST($http_path.'/', 'login', 'password');
 
 function authserver($username, $password) {
-	if (!($ch = curl_init('https://intranet.ovc.nl/auth/')))
+	if (!($ch = curl_init('https://intranet2.ovc.nl/auth/')))
 		fatal_error('error initializing cURL');
 
+	/*
 	if (preg_match('/^[a-z]+$/', $username)) {
 		if (!curl_setopt($ch, CURLOPT_USERPWD, 'OVC\\'.$username.':'.$password))
 			fatal_error(curl_error($ch));
 	} else if (!curl_setopt($ch, CURLOPT_USERPWD, 'LEERLING\\'.$username.':'.$password))
                         fatal_error(curl_error($ch));
+	 */
+	if (!curl_setopt($ch, CURLOPT_USERPWD, 'ASG\\'.$username.':'.$password))
 
 	// tijdelijke maatregel, certificaat verlopen
 	/*
@@ -59,7 +62,7 @@ if (!($row = mysql_fetch_assoc($result))) {
 	} else {
 		// authenticatieserver van school vindt ons lief
 		// ken ik u?
-		if (preg_match('/^[a-z]+$/', $_POST['login'])) {
+		if (preg_match('/^[a-z]+\.[a-z]+$/', $_POST['login'])) {
 
 		
 		// leraar
