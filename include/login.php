@@ -1,6 +1,8 @@
 <? 
 // deze include laat een loginscherm zien, alleen aanroepen vanuit index.php aub,
 // gesplitst om index.php overzichtelijk te houden
+//$_SESSION['warningmsg'] = "Wegens een probleem met de authenticatieserver, is het voor docenten alleen mogelijk om met de AFKOrting in te loggen";
+
 if (isset($_GET['lock_by']) && $_GET['lock_by'] != '') {
 	if ($_SESSION['orig_login'] != $_GET['lock_by'])
 		throw new Exception('lock_by parameter onjuist', 2);
@@ -62,7 +64,7 @@ Om deze website te kunnen gebruiken moet je
 <a href="http://nl.wikipedia.org/wiki/Cookies">cookies</a> en
 <a href="http://nl.wikipedia.org/wiki/Javascript">javascript</a> aan hebben staan.
 Gebruikers van het onlineklassenboek loggen in met hun gebruikersnaam en wachtwoord van school.
-<b>Docenten loggen vanaf nu in met hun nieuwe gebruikersnaam.</b>
+<!--<b>Docenten loggen vanaf nu in met hun nieuwe gebruikersnaam.</b>-->
 <!-- Medewerkers van school loggen in met hun schoolaccount.-->
 <!--Leerlingen loggen in met hun leerlingnummer en medewerkers van school doen dat met
 hun afkorting. Ouders loggen in met hun zelfgekozen code.-->
@@ -83,7 +85,7 @@ de pagina op 'Aanmaken'.-->
 <fieldset style="margin: 0 auto;">
 <legend>Toegang voor leerlingen en ouders</legend>
 Leerlingen en ouders kunnen het klassenboek eenvoudig inkijken door de klas of het leerlingnummer
-in te voeren. Persoonlijke notities, die docenten voor jou hebben gemaakt, kun je natuurlijk alleen zien als je inlogt. 
+in te voeren. Persoonlijke notities, die docenten voor jou hebben gemaakt, kun je natuurlijk alleen zien als je hierboven inlogt.
 <p>
 Klas/leerlingnummer <input type="text" name="q"><br>
 <input type="submit" value="Zoeken">
