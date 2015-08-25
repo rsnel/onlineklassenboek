@@ -62,7 +62,7 @@ if (!($row = mysql_fetch_assoc($result))) {
 	} else {
 		// authenticatieserver van school vindt ons lief
 		// ken ik u?
-		if (preg_match('/^[a-z]+\.[a-z]+$/', $_POST['login'])) {
+		if (preg_match('/^[a-z]+\.[a-z\-]+$/', $_POST['login'])) {
 
 		
 		// leraar
