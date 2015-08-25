@@ -440,7 +440,9 @@ function print_diff($row) {
 }
 
 
-if (!$_SESSION['toon_rooster']) {
+if (/*true*/ !$_SESSION['toon_rooster']) {
+	//if ($_SESSION['toon_rooster']) $roosterstatus = '\'<b>tijdelijk uitgeschakeld ivm nieuw schooljaar</b>\'';
+	//else
 	$roosterstatus = 'GEEN';
 	goto out; // geen rooster
 }
