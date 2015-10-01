@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `doc2grp2vak` (
 CREATE TABLE IF NOT EXISTS `grp` (
   `grp_id` int(11) NOT NULL auto_increment,
   `naam` varchar(32) collate utf8_bin NOT NULL,
-  `schooljaar` enum('0809','0910','1011','1112') collate utf8_bin NOT NULL,
+  `schooljaar` enum('0809','0910','1011','1112','1213','1314','1415','1516','1617','1718','1819','1920') collate utf8_bin NOT NULL,
   `stamklas` tinyint(1) NOT NULL default '0',
   `grp_type_id` varchar(32) collate utf8_bin NOT NULL,
   PRIMARY KEY  (`grp_id`),

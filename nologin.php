@@ -89,7 +89,7 @@ AND grp_id = ANY (
 	WHERE grp.grp_id != grp2.grp_id AND grp.grp_id = $grp_id
 	AND grp2.grp_type_id = ( SELECT grp_type_id FROM grp_types WHERE grp_type_naam = 'lesgroep' )
 )
-GROUP BY notitie_id
+GROUP BY notitie_id, tag_id
 EOQ;
 }
 
