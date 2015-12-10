@@ -98,7 +98,7 @@ SELECT dag, lesuur, GROUP_CONCAT(text ORDER BY grp DESC, notitie_id SEPARATOR '\
 FROM (
         SELECT dag, lesuur, CONCAT(
                 '<div class="',
-                IF(grp, 'grp', 'pers'), '">',
+                IF(grp, 'grp', 'pers'), ' ', GROUP_CONCAT(tagclass SEPARATOR ' '), '">',
                 IFNULL(target, ''),
                 IFNULL(bla3.text, ''),
                 IFNULL(GROUP_CONCAT(tags SEPARATOR ''), ''),
@@ -107,7 +107,7 @@ FROM (
                 SELECT dag, lesuur, target, text, edit, IFNULL(CONCAT(
                         '\n<span class="tag">[',
                         tag,
-                        ']</span>'), '') tags, notitie_id, grp
+                        ']</span>'), '') tags, IF(tag = 'et', 'toets', '') tagclass, notitie_id, grp
                 FROM ( $inner_query ) bla2
                 LEFT JOIN tags USING (tag_id)
                 GROUP BY notitie_id, tag_id

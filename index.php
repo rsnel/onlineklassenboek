@@ -355,7 +355,7 @@ SELECT dag, lesuur, GROUP_CONCAT(text ORDER BY grp DESC, notitie_id SEPARATOR '\
 FROM (
 	SELECT dag, lesuur, CONCAT(
 		'<div class="',
-		IF(grp, 'grp', 'pers'), '">',
+		IF(grp, 'grp', 'pers'), ' ', GROUP_CONCAT(tagclass SEPARATOR ' '),'">',
 		IFNULL(target, ''),
 		IFNULL(bla3.text, ''),
 		IFNULL(GROUP_CONCAT(tags SEPARATOR ''), ''),
@@ -387,7 +387,7 @@ FROM (
 					SEPARATOR '/')),
 				'')
 			),
-			']</span>'), '') tags, notitie_id, grp
+			']</span>'), '') tags, IF(tag = 'et', 'toets', '') tagclass, notitie_id, grp
 		FROM ( $inner_query ) bla2
 		LEFT JOIN tags USING (tag_id)
 		GROUP BY notitie_id, tag_id
@@ -583,7 +583,7 @@ status();
 <? echo(get_rooster_link());?> <a href="https://abvo.itslearning.com/">It's Learning</a> <?
 //$bla = urlencode('Klik dit window weg om terug te gaan naar onlineklassenboek.nl.');
 if ($_SESSION['type']!='leerling' && $_SESSION['type'] != 'ouder'/* && $_SERVER['REMOTE_ADDR'] == '145.118.199.242'*/) {
-		 ?> <a href="https://start7.mijnsom.nl/app/login/asg?0" target="_blank">som</a> <a href="http://onlineklassenboek.nl/handleiding/">Docentenhandleiding</a><? } if ($no_issues > 0 && $_SESSION['type'] == 'personeel') echo(" Je hebt $no_issues <a href=\"issues.php?doelgroep=zelf&grp2vak_id=$grp2vak_id&lln_id=$lln_id\">openstaande issues</a>."); ?>
+		 ?> <a href="https://asg.somtoday.nl/" target="_blank">som</a> <a href="https://onlineklassenboek.nl/handleiding/">Docentenhandleiding</a><? } if ($no_issues > 0 && $_SESSION['type'] == 'personeel') echo(" Je hebt $no_issues <a href=\"issues.php?doelgroep=zelf&grp2vak_id=$grp2vak_id&lln_id=$lln_id\">openstaande issues</a>."); ?>
 <? if ($_SESSION['type'] == 'ouder') { ?>
 	<input type="hidden" name="doelgroep" value="leerling">
 	<p>leerling:<? echo($lln_options) ?> <a href="ouder_auth_request.php">klik hier om een broer(tje)/zus(je) toe te voegen</a>
