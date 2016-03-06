@@ -387,7 +387,7 @@ FROM (
 					SEPARATOR '/')),
 				'')
 			),
-			']</span>'), '') tags, IF(tag = 'et', 'toets', '') tagclass, notitie_id, grp
+			']</span>'), '') tags, IF(tag = 'et' OR tag = 'se', 'toets', '') tagclass, notitie_id, grp
 		FROM ( $inner_query ) bla2
 		LEFT JOIN tags USING (tag_id)
 		GROUP BY notitie_id, tag_id
@@ -461,13 +461,13 @@ if (!$week_info) {
 $week_id = $week_info[0];
 
 $basis = mysql_fetch_assoc(mysql_query_safe(
-	"SELECT file_id, basis_id, timestamp FROM $roosterdb.roosters WHERE week_id <= $week_id AND wijz_id = 0 ORDER BY rooster_id DESC LIMIT 1"));
+	"SELECT file_id, basis_id, timestamp FROM $roosterdb.roosters WHERE week_id <= $week_id AND wijz_id = 0 ORDER BY week_id DESC, rooster_id DESC LIMIT 1"));
 if (!$basis) {
 	$roosterstatus = 'GEEN';
 	goto out;
 }
 $wijz = mysql_fetch_assoc(mysql_query_safe(
-	"SELECT file_id, wijz_id, timestamp FROM $roosterdb.roosters WHERE week_id = $week_id AND basis_id = {$basis['basis_id']} ORDER BY rooster_id DESC LIMIT 1"));
+	"SELECT file_id, wijz_id, timestamp FROM $roosterdb.roosters WHERE week_id = $week_id AND basis_id = {$basis['basis_id']} ORDER BY week_id DESC, rooster_id DESC LIMIT 1"));
 if ($basis['file_id'] == $wijz['file_id'] || !$wijz['file_id']) $wijz['file_id'] = 0;
 
 

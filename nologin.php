@@ -107,7 +107,7 @@ FROM (
                 SELECT dag, lesuur, target, text, edit, IFNULL(CONCAT(
                         '\n<span class="tag">[',
                         tag,
-                        ']</span>'), '') tags, IF(tag = 'et', 'toets', '') tagclass, notitie_id, grp
+                        ']</span>'), '') tags, IF(tag = 'et' OR tag = 'se', 'toets', '') tagclass, notitie_id, grp
                 FROM ( $inner_query ) bla2
                 LEFT JOIN tags USING (tag_id)
                 GROUP BY notitie_id, tag_id
