@@ -55,6 +55,7 @@ $tags .= ' '.sprint_tag_checkbox('tags[]', 'se', $tag_ids);
 $tags .= ' '.sprint_tag_checkbox('tags[]', 'inleveren').' <!--periode: <select name="per"><option default value=""></option><option value="per1">1</option><option value="per2">2</option><option value="per3">3</option></select>--><br>';
 $tags .= 'huiswerk: ';
 $tags .= sprint_tag_checkbox('tags[]', 'maken', $tag_ids);
+$tags .= ' '.sprint_tag_checkbox('tags[]', 'vertalen', $tag_ids);
 $tags .= ' '.sprint_tag_checkbox('tags[]', 'nakijken', $tag_ids);
 $tags .= ' '.sprint_tag_checkbox('tags[]', 'leren', $tag_ids).'<br>';
 $tags .= 'planning: ';
